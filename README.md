@@ -286,14 +286,14 @@ Per assignment requirements: AI tools were used during development. The candidat
 | Item | Details |
 |------|---------|
 | **Tool** | Cursor (Claude) |
-| **Work split** | **~70% manual** (candidate) / **~30% AI-assisted** |
 
-### Work split (~70% manual / ~30% AI-assisted)
+
+### Work split 
 
 | Share | What was done |
 |-------|----------------|
-| **~70% manual (candidate)** | Assignment scoping and requirements breakdown; **architecture planning** (Clean Architecture + MVVM layer boundaries, use-case boundaries, repository contracts, navigation model); **project formation** (Xcode target setup, folder structure, dependency choices — SwiftData, Keychain, Nuke, UIKit login + SwiftUI tabs); core domain modeling (`Product`, auth models, pagination); repository merge logic (API + local SwiftData, soft vs hard delete); auth/session and biometric gating design; offline cache strategy; UX decisions (delete confirmations EN/HE, favorites undo, reset behavior); wiring `DIContainer` and `AppRouter`; code review of every AI-generated diff; manual simulator testing; test design direction and failure triage; README structure and trade-off documentation |
-| **~30% AI-assisted** | Boilerplate and repetitive file generation from my specs; initial view/ViewModel scaffolding; Nuke pipeline setup snippets; string-catalog entries; expanding unit tests once patterns were defined; README prose drafts; targeted bug-fix iterations when I described the exact failure (NavigationStack alert, `dismiss()` pop, Swift 6 `@MainActor` test isolation) |
+| **~ manual (candidate)** | Assignment scoping and requirements breakdown; **architecture planning** (Clean Architecture + MVVM layer boundaries, use-case boundaries, repository contracts, navigation model); **project formation** (Xcode target setup, folder structure, dependency choices — SwiftData, Keychain, Nuke, UIKit login + SwiftUI tabs); core domain modeling (`Product`, auth models, pagination); repository merge logic (API + local SwiftData, soft vs hard delete); auth/session and biometric gating design; offline cache strategy; UX decisions (delete confirmations EN/HE, favorites undo, reset behavior); wiring `DIContainer` and `AppRouter`; code review of every AI-generated diff; manual simulator testing; test design direction and failure triage; README structure and trade-off documentation |
+| **~ AI-assisted** | Boilerplate and repetitive file generation from my specs; initial view/ViewModel scaffolding; Nuke pipeline setup snippets; string-catalog entries; expanding unit tests once patterns were defined; README prose drafts; targeted bug-fix iterations when I described the exact failure (NavigationStack alert, `dismiss()` pop, Swift 6 `@MainActor` test isolation) |
 
 ### Prompts used (meaningful examples)
 
