@@ -1,3 +1,10 @@
+//
+//  ProductUseCases.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import Foundation
 
 struct FetchProductsUseCase: Sendable {
@@ -57,18 +64,6 @@ struct SaveProductUseCase: Sendable {
 
     func execute(_ product: Product) async throws {
         try await productRepository.saveProduct(product)
-    }
-}
-
-struct DeleteProductUseCase: Sendable {
-    private let productRepository: ProductRepositoryProtocol
-
-    init(productRepository: ProductRepositoryProtocol) {
-        self.productRepository = productRepository
-    }
-
-    func execute(id: Int) async throws {
-        try await productRepository.deleteProduct(id: id)
     }
 }
 

@@ -1,29 +1,11 @@
+//
+//  FavoritesView.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import SwiftUI
-
-struct FavoritesFlowView: View {
-    let container: DIContainer
-    @ObservedObject var viewModel: FavoritesViewModel
-    @EnvironmentObject private var router: AppRouter
-
-    var body: some View {
-        NavigationStack(path: $router.favoritesPath) {
-            FavoritesView(viewModel: viewModel)
-                .navigationDestination(for: ProductRoute.self) { route in
-                    switch route {
-                    case .detail(let productID):
-                        ProductDetailView(
-                            viewModel: container.makeProductDetailViewModel(productID: productID)
-                        )
-                        .id(productID)
-                    case .editor(let productID):
-                        ProductEditorView(
-                            viewModel: container.makeProductEditorViewModel(productID: productID)
-                        )
-                    }
-                }
-        }
-    }
-}
 
 struct FavoritesView: View {
     @ObservedObject var viewModel: FavoritesViewModel
@@ -48,17 +30,7 @@ struct FavoritesView: View {
                     Button {
                         viewModel.openDetail(productID: product.id)
                     } label: {
-                        HStack(spacing: 12) {
-                            ProductImageView(url: product.thumbnailURL)
-                                .frame(width: 56, height: 56)
-
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(product.title)
-                                    .font(.headline)
-                                Text(product.price, format: .currency(code: "USD"))
-                                    .font(.subheadline)
-                            }
-                        }
+                        FavoritesRowView(product: product)
                     }
                     .buttonStyle(.plain)
                     .swipeActions {
@@ -91,25 +63,5 @@ struct FavoritesView: View {
             }
         }
         .animation(.easeInOut, value: viewModel.undoAction)
-    }
-}
-
-struct UndoBanner: View {
-    let message: String
-    let actionTitle: String
-    let action: () -> Void
-
-    var body: some View {
-        HStack {
-            Text(message)
-                .lineLimit(1)
-            Spacer()
-            Button(actionTitle, action: action)
-                .fontWeight(.semibold)
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(radius: 8, y: 4)
     }
 }

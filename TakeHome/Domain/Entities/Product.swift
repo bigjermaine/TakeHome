@@ -1,3 +1,10 @@
+//
+//  Product.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import Foundation
 
 struct Product: Identifiable, Hashable, Sendable {

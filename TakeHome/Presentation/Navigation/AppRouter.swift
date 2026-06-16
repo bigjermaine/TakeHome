@@ -1,3 +1,10 @@
+//
+//  AppRouter.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import Foundation
 import SwiftUI
 import Combine
@@ -73,6 +80,13 @@ final class AppRouter: ObservableObject {
     func openProductEditor(id: Int?) {
         selectedTab = .products
         productPath.append(ProductRoute.editor(productID: id))
+    }
+
+    func handleUnlikeFromDetail() {
+        if selectedTab == .favorites && !favoritesPath.isEmpty {
+            favoritesPath.removeLast()
+        }
+        container.makeFavoritesViewModel().load()
     }
 
     func logout() async {

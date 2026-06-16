@@ -1,3 +1,10 @@
+//
+//  ProductRepositoryProtocol.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import Foundation
 
 protocol ProductRepositoryProtocol: Sendable {
@@ -16,7 +23,6 @@ protocol ProductRepositoryProtocol: Sendable {
         sort: ProductSortOption
     ) throws -> [Product]
     func saveProduct(_ product: Product) async throws
-    func deleteProduct(id: Int) async throws
     func resetLocalChanges() async throws
     func categories() throws -> [String]
 }

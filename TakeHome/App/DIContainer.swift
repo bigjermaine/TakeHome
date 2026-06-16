@@ -1,3 +1,10 @@
+//
+//  DIContainer.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import SwiftUI
 import SwiftData
 import Nuke
@@ -48,7 +55,6 @@ final class DIContainer {
     lazy var fetchProductsUseCase = FetchProductsUseCase(productRepository: productRepository)
     lazy var fetchProductDetailUseCase = FetchProductDetailUseCase(productRepository: productRepository)
     lazy var saveProductUseCase = SaveProductUseCase(productRepository: productRepository)
-    lazy var deleteProductUseCase = DeleteProductUseCase(productRepository: productRepository)
     lazy var resetProductsUseCase = ResetProductsUseCase(productRepository: productRepository)
     lazy var fetchCategoriesUseCase = FetchCategoriesUseCase(productRepository: productRepository)
 
@@ -119,7 +125,6 @@ final class DIContainer {
             productID: productID,
             fetchProductDetailUseCase: fetchProductDetailUseCase,
             toggleFavoriteUseCase: toggleFavoriteUseCase,
-            deleteProductUseCase: deleteProductUseCase,
             imageLoader: imageLoader,
             router: appRouter
         )
@@ -141,10 +146,6 @@ final class DIContainer {
         )
         editorViewModelCache[cacheKey] = viewModel
         return viewModel
-    }
-
-    func invalidateProductDetailViewModel(productID: Int) {
-        detailViewModelCache.removeValue(forKey: productID)
     }
 
     func makeFavoritesViewModel() -> FavoritesViewModel {

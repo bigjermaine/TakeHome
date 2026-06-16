@@ -1,3 +1,10 @@
+//
+//  ProductRepository.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import Foundation
 
 @MainActor
@@ -143,10 +150,6 @@ final class ProductRepository: ProductRepositoryProtocol {
             )
         }
         try localDataSource.upsert(updated)
-    }
-
-    func deleteProduct(id: Int) async throws {
-        try localDataSource.deleteRecord(id: id)
     }
 
     func resetLocalChanges() async throws {

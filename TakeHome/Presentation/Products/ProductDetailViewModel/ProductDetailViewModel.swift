@@ -1,3 +1,10 @@
+//
+//  ProductDetailViewModel.swift
+//  TakeHome
+//
+//  Created by jermaine daniel on 15/06/2026.
+//
+
 import Foundation
 import Combine
 
@@ -16,7 +23,6 @@ final class ProductDetailViewModel: ObservableObject {
 
     private let fetchProductDetailUseCase: FetchProductDetailUseCase
     private let toggleFavoriteUseCase: ToggleFavoriteUseCase
-    private let deleteProductUseCase: DeleteProductUseCase
     private let imageLoader: ImageLoadingProtocol
     private let router: AppRouter
 
@@ -24,14 +30,12 @@ final class ProductDetailViewModel: ObservableObject {
         productID: Int,
         fetchProductDetailUseCase: FetchProductDetailUseCase,
         toggleFavoriteUseCase: ToggleFavoriteUseCase,
-        deleteProductUseCase: DeleteProductUseCase,
         imageLoader: ImageLoadingProtocol,
         router: AppRouter
     ) {
         self.productID = productID
         self.fetchProductDetailUseCase = fetchProductDetailUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
-        self.deleteProductUseCase = deleteProductUseCase
         self.imageLoader = imageLoader
         self.router = router
     }
@@ -70,11 +74,13 @@ final class ProductDetailViewModel: ObservableObject {
             if isFavorite {
                 _ = try toggleFavoriteUseCase.remove(productID: productID)
                 isFavorite = false
+                HapticFeedback.play(.warning)
+                router.handleUnlikeFromDetail()
             } else {
                 try toggleFavoriteUseCase.add(productID: productID)
                 isFavorite = true
+                HapticFeedback.play(.selection)
             }
-            HapticFeedback.play(.selection)
         } catch {
             // Keep current favorite state on failure.
         }
@@ -82,16 +88,5 @@ final class ProductDetailViewModel: ObservableObject {
 
     func openEditor() {
         router.openProductEditor(id: productID)
-    }
-
-    func deleteProduct() async -> Bool {
-        do {
-            try await deleteProductUseCase.execute(id: productID)
-            HapticFeedback.play(.success)
-            return true
-        } catch {
-            HapticFeedback.play(.error)
-            return false
-        }
     }
 }
