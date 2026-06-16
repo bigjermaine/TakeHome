@@ -95,15 +95,30 @@ struct ProductDetailView: View {
                     HapticFeedback.play(.light)
                     viewModel.openEditor()
                 }
+
+                Button {
+                    guard case .loaded(let product) = viewModel.viewState else { return }
+                    HapticFeedback.play(.warning)
+                    router.presentDeleteConfirmation(
+                        for: viewModel.productID,
+                        isLocalOnly: product.isLocalOnly
+                    )
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .tint(.red)
             }
         }
         .onAppear {
             Task { await viewModel.load() }
         }
         .onChange(of: router.productPath.count) { oldCount, newCount in
-            if newCount < oldCount {
-                Task { await viewModel.load() }
-            }
+            guard newCount < oldCount, newCount > 0 else { return }
+            Task { await viewModel.load() }
+        }
+        .onChange(of: router.favoritesPath.count) { oldCount, newCount in
+            guard newCount < oldCount, newCount > 0 else { return }
+            Task { await viewModel.load() }
         }
     }
 }

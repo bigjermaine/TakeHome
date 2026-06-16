@@ -23,6 +23,7 @@ protocol ProductRepositoryProtocol: Sendable {
         sort: ProductSortOption
     ) throws -> [Product]
     func saveProduct(_ product: Product) async throws
+    func deleteProduct(id: Int) async throws
     func resetLocalChanges() async throws
     func categories() throws -> [String]
 }

@@ -7,6 +7,17 @@
 
 import Foundation
 
+enum ProductRepositoryError: LocalizedError {
+    case productNotFound
+
+    var errorDescription: String? {
+        switch self {
+        case .productNotFound:
+            return "Product not found."
+        }
+    }
+}
+
 @MainActor
 final class ProductRepository: ProductRepositoryProtocol {
     private let remoteDataSource: ProductRemoteDataSource
@@ -107,7 +118,11 @@ final class ProductRepository: ProductRepositoryProtocol {
 
     func fetchProduct(id: Int) async throws -> Product {
         if let local = try localDataSource.record(id: id) {
-            return ProductMapper.map(local)
+            let product = ProductMapper.map(local)
+            if product.isDeleted {
+                throw ProductRepositoryError.productNotFound
+            }
+            return product
         }
 
         let dto = try await remoteDataSource.fetchProduct(id: id)
@@ -150,6 +165,14 @@ final class ProductRepository: ProductRepositoryProtocol {
             )
         }
         try localDataSource.upsert(updated)
+    }
+
+    func deleteProduct(id: Int) async throws {
+        if try localDataSource.record(id: id) == nil {
+            let dto = try await remoteDataSource.fetchProduct(id: id)
+            try localDataSource.upsert(ProductMapper.map(dto))
+        }
+        try localDataSource.deleteRecord(id: id)
     }
 
     func resetLocalChanges() async throws {

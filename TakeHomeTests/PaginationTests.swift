@@ -8,6 +8,7 @@
 import XCTest
 @testable import TakeHome
 
+@MainActor
 final class PaginationTests: XCTestCase {
     func testFirstPageRequest_startsAtZero() {
         let request = PageRequest.first(limit: 20)
@@ -44,5 +45,16 @@ final class PaginationTests: XCTestCase {
 
         XCTAssertEqual(next.skip, 20)
         XCTAssertEqual(next.limit, 20)
+    }
+
+    func testPaginatedResult_hasNoMoreWhenTotalMatchesLoadedItems() {
+        let result = PaginatedResult(
+            items: Array(repeating: 1, count: 15),
+            total: 15,
+            request: PageRequest.first(limit: 20)
+        )
+
+        XCTAssertFalse(result.hasMore)
+        XCTAssertNil(result.nextRequest(currentItemCount: 15))
     }
 }

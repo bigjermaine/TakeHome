@@ -85,15 +85,17 @@ final class ProductLocalDataSource {
     }
 
     func deleteRecord(id: Int) throws {
-        if let record = try record(id: id) {
-            if record.isLocalOnly {
-                modelContext.delete(record)
-            } else {
-                record.isDeleted = true
-                record.updatedAt = .now
-            }
-            try modelContext.save()
+        guard let record = try record(id: id) else {
+            throw ProductRepositoryError.productNotFound
         }
+
+        if record.isLocalOnly {
+            modelContext.delete(record)
+        } else {
+            record.isDeleted = true
+            record.updatedAt = .now
+        }
+        try modelContext.save()
     }
 
     func resetLocalChanges() throws {

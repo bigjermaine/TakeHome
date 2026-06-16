@@ -67,6 +67,18 @@ struct SaveProductUseCase: Sendable {
     }
 }
 
+struct DeleteProductUseCase: Sendable {
+    private let productRepository: ProductRepositoryProtocol
+
+    init(productRepository: ProductRepositoryProtocol) {
+        self.productRepository = productRepository
+    }
+
+    func execute(id: Int) async throws {
+        try await productRepository.deleteProduct(id: id)
+    }
+}
+
 struct ResetProductsUseCase: Sendable {
     private let productRepository: ProductRepositoryProtocol
 

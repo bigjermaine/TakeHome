@@ -16,9 +16,13 @@ final class AppRouter: ObservableObject {
     @Published var selectedTab: TabRoute = .products
     @Published var productPath = NavigationPath()
     @Published var favoritesPath = NavigationPath()
+    @Published var isDeleteConfirmationPresented = false
+    @Published var deleteConfirmationProductID: Int?
+    @Published var deleteConfirmationIsLocalOnly = false
 
     private let container: DIContainer
     private var needsUnlockAfterBackground = false
+    private var activeDetailPath: TabRoute?
 
     init(container: DIContainer) {
         self.container = container
@@ -69,11 +73,13 @@ final class AppRouter: ObservableObject {
 
     func openProductDetail(id: Int) {
         selectedTab = .products
+        activeDetailPath = .products
         productPath.append(ProductRoute.detail(productID: id))
     }
 
     func openFavoriteProductDetail(id: Int) {
         selectedTab = .favorites
+        activeDetailPath = .favorites
         favoritesPath.append(ProductRoute.detail(productID: id))
     }
 
@@ -82,10 +88,56 @@ final class AppRouter: ObservableObject {
         productPath.append(ProductRoute.editor(productID: id))
     }
 
+    func presentDeleteConfirmation(for productID: Int, isLocalOnly: Bool) {
+        deleteConfirmationProductID = productID
+        deleteConfirmationIsLocalOnly = isLocalOnly
+        isDeleteConfirmationPresented = true
+    }
+
+    func dismissDeleteConfirmation() {
+        deleteConfirmationProductID = nil
+        deleteConfirmationIsLocalOnly = false
+        isDeleteConfirmationPresented = false
+    }
+
+    func confirmDeleteProduct(productID: Int) async {
+        do {
+            try await container.deleteProductUseCase.execute(id: productID)
+            popProductDetail(for: productID)
+            HapticFeedback.play(.success)
+        } catch {
+            container.makeProductDetailViewModel(productID: productID).showError(error.localizedDescription)
+            HapticFeedback.play(.error)
+        }
+    }
+
+    func popProductDetail(for productID: Int) {
+        container.invalidateProductDetailViewModel(productID: productID)
+
+        switch activeDetailPath {
+        case .favorites:
+            if !favoritesPath.isEmpty {
+                favoritesPath.removeLast()
+            }
+        case .products, .settings, .none:
+            if !productPath.isEmpty {
+                productPath.removeLast()
+            }
+        }
+
+        activeDetailPath = nil
+        container.makeProductListViewModel().reloadFromCache()
+        refreshFavorites()
+    }
+
     func handleUnlikeFromDetail() {
         if selectedTab == .favorites && !favoritesPath.isEmpty {
             favoritesPath.removeLast()
         }
+        refreshFavorites()
+    }
+
+    func refreshFavorites() {
         container.makeFavoritesViewModel().load()
     }
 

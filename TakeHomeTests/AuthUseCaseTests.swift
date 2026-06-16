@@ -8,6 +8,7 @@
 import XCTest
 @testable import TakeHome
 
+@MainActor
 final class LoginUseCaseTests: XCTestCase {
     func testExecute_savesSessionOnSuccess() async throws {
         let repository = MockAuthRepository()
@@ -40,6 +41,7 @@ final class LoginUseCaseTests: XCTestCase {
     }
 }
 
+@MainActor
 final class ValidateSessionUseCaseTests: XCTestCase {
     func testExecute_returnsStoredSession() throws {
         let repository = MockAuthRepository()
@@ -63,6 +65,7 @@ final class ValidateSessionUseCaseTests: XCTestCase {
     }
 }
 
+@MainActor
 final class BiometricLoginUseCaseTests: XCTestCase {
     func testExecute_requiresStoredSession() async {
         let repository = MockAuthRepository()
@@ -98,5 +101,75 @@ final class BiometricLoginUseCaseTests: XCTestCase {
         let session = try await useCase.execute()
 
         XCTAssertEqual(session.username, "demo")
+    }
+
+    func testCanUseBiometrics_requiresStoredSession() {
+        let repository = MockAuthRepository()
+        let biometrics = MockBiometricAuth()
+        let settings = MockSettingsRepository()
+        let useCase = AuthenticateWithBiometricsUseCase(
+            authRepository: repository,
+            biometricAuth: biometrics,
+            settingsRepository: settings
+        )
+
+        XCTAssertFalse(useCase.canUseBiometrics)
+
+        repository.storedSession = AuthSession(username: "demo", token: "abc", createdAt: .now)
+        XCTAssertTrue(useCase.canUseBiometrics)
+    }
+
+    func testExecute_throwsWhenBiometricsUnavailable() async {
+        let repository = MockAuthRepository()
+        repository.storedSession = AuthSession(username: "demo", token: "abc", createdAt: .now)
+        let biometrics = MockBiometricAuth()
+        biometrics.canEvaluateBiometrics = false
+        let settings = MockSettingsRepository()
+        let useCase = AuthenticateWithBiometricsUseCase(
+            authRepository: repository,
+            biometricAuth: biometrics,
+            settingsRepository: settings
+        )
+
+        do {
+            _ = try await useCase.execute()
+            XCTFail("Expected biometrics unavailable")
+        } catch let error as AuthError {
+            XCTAssertEqual(error, .biometricsUnavailable)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testExecute_throwsWhenBiometricsFails() async {
+        let repository = MockAuthRepository()
+        repository.storedSession = AuthSession(username: "demo", token: "abc", createdAt: .now)
+        let biometrics = MockBiometricAuth()
+        biometrics.authenticateResult = .failure(AuthError.biometricsFailed)
+        let settings = MockSettingsRepository()
+        let useCase = AuthenticateWithBiometricsUseCase(
+            authRepository: repository,
+            biometricAuth: biometrics,
+            settingsRepository: settings
+        )
+
+        do {
+            _ = try await useCase.execute()
+            XCTFail("Expected biometrics failed")
+        } catch let error as AuthError {
+            XCTAssertEqual(error, .biometricsFailed)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+}
+
+@MainActor
+final class AuthErrorTests: XCTestCase {
+    func testLocalizationKeys_matchExpectedMessages() {
+        XCTAssertEqual(AuthError.invalidCredentials.localizationKey, "Invalid username or password.")
+        XCTAssertEqual(AuthError.sessionExpired.localizationKey, "Your session has expired. Please sign in again.")
+        XCTAssertEqual(AuthError.biometricsUnavailable.localizationKey, "Biometric authentication is not available.")
+        XCTAssertEqual(AuthError.biometricsFailed.localizationKey, "Biometric authentication failed.")
     }
 }

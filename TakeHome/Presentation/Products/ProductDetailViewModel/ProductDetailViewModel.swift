@@ -74,13 +74,13 @@ final class ProductDetailViewModel: ObservableObject {
             if isFavorite {
                 _ = try toggleFavoriteUseCase.remove(productID: productID)
                 isFavorite = false
-                HapticFeedback.play(.warning)
                 router.handleUnlikeFromDetail()
             } else {
                 try toggleFavoriteUseCase.add(productID: productID)
                 isFavorite = true
-                HapticFeedback.play(.selection)
+                router.refreshFavorites()
             }
+            HapticFeedback.play(.selection)
         } catch {
             // Keep current favorite state on failure.
         }
@@ -88,5 +88,9 @@ final class ProductDetailViewModel: ObservableObject {
 
     func openEditor() {
         router.openProductEditor(id: productID)
+    }
+
+    func showError(_ message: String) {
+        viewState = .error(message)
     }
 }

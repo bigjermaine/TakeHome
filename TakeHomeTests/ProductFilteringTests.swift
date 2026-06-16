@@ -8,50 +8,12 @@
 import XCTest
 @testable import TakeHome
 
+@MainActor
 final class ProductFilteringTests: XCTestCase {
     private let sampleProducts: [Product] = [
-        Product(
-            id: 1,
-            title: "Alpha Phone",
-            productDescription: "A phone",
-            price: 999,
-            category: "smartphones",
-            thumbnailURL: nil,
-            imageURLs: [],
-            brand: "Alpha",
-            rating: 4.5,
-            stock: 10,
-            isLocalOnly: false,
-            isDeleted: false
-        ),
-        Product(
-            id: 2,
-            title: "Beta Laptop",
-            productDescription: "A laptop",
-            price: 1499,
-            category: "laptops",
-            thumbnailURL: nil,
-            imageURLs: [],
-            brand: "Beta",
-            rating: 4.8,
-            stock: 5,
-            isLocalOnly: false,
-            isDeleted: false
-        ),
-        Product(
-            id: 3,
-            title: "Gamma Phone",
-            productDescription: "Another phone",
-            price: 799,
-            category: "smartphones",
-            thumbnailURL: nil,
-            imageURLs: [],
-            brand: "Gamma",
-            rating: 4.2,
-            stock: 0,
-            isLocalOnly: false,
-            isDeleted: true
-        )
+        Product.fixture(id: 1, title: "Alpha Phone", category: "smartphones", price: 999, brand: "Alpha", rating: 4.5),
+        Product.fixture(id: 2, title: "Beta Laptop", category: "laptops", price: 1499, brand: "Beta", rating: 4.8),
+        Product.fixture(id: 3, title: "Gamma Phone", category: "smartphones", price: 799, brand: "Gamma", rating: 4.2, stock: 0, isDeleted: true)
     ]
 
     func testApply_filtersDeletedProducts() {
@@ -94,5 +56,45 @@ final class ProductFilteringTests: XCTestCase {
         )
 
         XCTAssertEqual(result.map(\.id), [2, 1])
+    }
+
+    func testSort_ordersByTitleAscending() {
+        let result = ProductFiltering.sort(
+            products: sampleProducts.filter { !$0.isDeleted },
+            by: .titleAscending
+        )
+
+        XCTAssertEqual(result.map(\.title), ["Alpha Phone", "Beta Laptop"])
+    }
+
+    func testSort_ordersByRatingDescending() {
+        let result = ProductFiltering.sort(
+            products: sampleProducts.filter { !$0.isDeleted },
+            by: .ratingDescending
+        )
+
+        XCTAssertEqual(result.map(\.id), [2, 1])
+    }
+
+    func testApply_matchesBrandInSearchQuery() {
+        let result = ProductFiltering.apply(
+            to: sampleProducts,
+            searchQuery: "beta",
+            category: nil,
+            sortOption: .titleAscending
+        )
+
+        XCTAssertEqual(result.map(\.id), [2])
+    }
+
+    func testApply_allCategoryIgnoresCategoryFilter() {
+        let result = ProductFiltering.apply(
+            to: sampleProducts,
+            searchQuery: nil,
+            category: "All",
+            sortOption: .titleAscending
+        )
+
+        XCTAssertEqual(result.map(\.id), [1, 2])
     }
 }

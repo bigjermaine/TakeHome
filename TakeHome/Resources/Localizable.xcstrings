@@ -747,6 +747,28 @@
         }
       }
     },
+    "This locally created product will be permanently removed from your device." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מוצר מקומי זה יוסר לצמיתות מהמכשיר."
+          }
+        }
+      }
+    },
+    "This product will be hidden from your catalog until you reset local changes." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מוצר זה יוסתר מהקטלוג עד שתאפס שינויים מקומיים."
+          }
+        }
+      }
+    },
     "Thumbnail URL" : {
       "localizations" : {
         "he" : {
