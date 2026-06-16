@@ -303,7 +303,7 @@ Prompts were **directional** — I defined the architecture and structure first;
 2. **Project formation:** "Split `ProductListView` into a subfolder with one file per section; mirror that pattern for Favorites and Auth; keep ViewModels in sibling folders."
 3. **Delete UX (after I chose soft vs hard delete):** "Alert must live on `MainTabView`, not inside `navigationDestination`; two confirmation strings for local-only vs API products."
 4. **Testing (after I defined coverage goals):** "Add ViewModel and `AppRouter` tests using existing mocks; follow `@MainActor` on test classes for Swift 6."
-5. **Documentation:** "Align README with the assignment PDF checklist; document my manual architecture decisions and a 70/30 manual/AI split."
+
 
 ### Manual intervention (architecture, planning, and review)
 
