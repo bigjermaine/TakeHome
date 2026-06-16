@@ -283,28 +283,37 @@ Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`. The 
 
 Per assignment requirements: AI tools were used during development. The candidate remains responsible for the final implementation and code quality.
 
-### Work split (~70% AI-assisted / ~30% manual)
+| Item | Details |
+|------|---------|
+| **Tool** | Cursor (Claude) |
+| **Work split** | **~70% manual** (candidate) / **~30% AI-assisted** |
+
+### Work split (~70% manual / ~30% AI-assisted)
 
 | Share | What was done |
 |-------|----------------|
-| **~70% AI-assisted** | Initial Clean Architecture scaffolding, folder/file organization, Nuke image pipeline wiring, localization catalog setup, navigation router structure, bulk unit-test expansion (use cases, ViewModels, router, keychain), README drafting, and iterative bug fixes (delete alert presentation, navigation pop, Swift 6 `@MainActor` test isolation) |
-| **~30% manual** | Product requirements interpretation, repository merge/pagination logic review, auth/session flow decisions, offline cache behavior, delete confirmation UX and copy (EN/HE), favorites undo timing, settings defaults, manual device/simulator verification, test failure triage, and final code review before submission |
+| **~70% manual (candidate)** | Assignment scoping and requirements breakdown; **architecture planning** (Clean Architecture + MVVM layer boundaries, use-case boundaries, repository contracts, navigation model); **project formation** (Xcode target setup, folder structure, dependency choices — SwiftData, Keychain, Nuke, UIKit login + SwiftUI tabs); core domain modeling (`Product`, auth models, pagination); repository merge logic (API + local SwiftData, soft vs hard delete); auth/session and biometric gating design; offline cache strategy; UX decisions (delete confirmations EN/HE, favorites undo, reset behavior); wiring `DIContainer` and `AppRouter`; code review of every AI-generated diff; manual simulator testing; test design direction and failure triage; README structure and trade-off documentation |
+| **~30% AI-assisted** | Boilerplate and repetitive file generation from my specs; initial view/ViewModel scaffolding; Nuke pipeline setup snippets; string-catalog entries; expanding unit tests once patterns were defined; README prose drafts; targeted bug-fix iterations when I described the exact failure (NavigationStack alert, `dismiss()` pop, Swift 6 `@MainActor` test isolation) |
 
 ### Prompts used (meaningful examples)
 
-1. **Architecture:** "Structure the take-home app with Clean Architecture + MVVM, route-based navigation, and separate Domain/Data/Platform layers."
-2. **Organization:** "Split large view files into subfolders per screen; put ViewModels in their own folders; split mocks into separate test files."
-3. **Delete UX:** "Restore local product delete with confirmation messages; present alert from tab root so it works inside NavigationStack; different messages for local-only vs API products."
-4. **Testing:** "Raise unit test coverage to submission quality — add ViewModel tests, AuthRepository/keychain tests, AppRouter navigation tests, and mapper tests."
-5. **Documentation:** "Update README to match assignment PDF standards; document the ~70/30 AI/manual split with concrete prompts and verification steps."
+Prompts were **directional** — I defined the architecture and structure first; AI accelerated implementation against that plan.
 
-### Manual intervention (what I changed or verified after AI output)
+1. **Architecture (from my plan):** "I already have Domain / Data / Platform / Presentation layers. Generate scaffolding for use cases and repository protocols matching this layout — do not change layer boundaries."
+2. **Project formation:** "Split `ProductListView` into a subfolder with one file per section; mirror that pattern for Favorites and Auth; keep ViewModels in sibling folders."
+3. **Delete UX (after I chose soft vs hard delete):** "Alert must live on `MainTabView`, not inside `navigationDestination`; two confirmation strings for local-only vs API products."
+4. **Testing (after I defined coverage goals):** "Add ViewModel and `AppRouter` tests using existing mocks; follow `@MainActor` on test classes for Swift 6."
+5. **Documentation:** "Align README with the assignment PDF checklist; document my manual architecture decisions and a 70/30 manual/AI split."
 
-- Confirmed DummyJSON pagination semantics and adjusted skip/limit handling for local-only products on page one.
-- Reworked delete flow: confirmation alert on `MainTabView`, pop via `AppRouter` instead of `dismiss()`, separate bindings so confirm action retains product ID.
-- Chose soft-delete for API products vs hard-delete for local-only items; wrote user-facing confirmation strings.
-- Reviewed Keychain session encoding, biometric unlock gating, and offline banner behavior on real network toggles.
-- Ran `⌘B` / `⌘U` in Xcode, fixed Swift 6 MainActor isolation in tests, and spot-checked login, CRUD, favorites undo, Hebrew RTL, and theme switching on simulator.
+### Manual intervention (architecture, planning, and review)
+
+- **Planned** layer dependencies (Presentation → Domain ← Data/Platform) and enforced one-way flow before any feature code.
+- **Designed** navigation: tab-based `AppRouter`, separate product/favorites paths, delete confirmation at tab root to avoid SwiftUI `NavigationStack` alert bugs.
+- **Defined** product lifecycle: local negative IDs, merge on page one, soft-delete for API items, hard-delete for local-only, reset to restore catalog.
+- **Specified** auth flow: mocked credentials, Keychain session persistence, optional biometric unlock on launch/background.
+- **Chose** tech stack and integration points (DummyJSON, SwiftData, Nuke, UIKit login animation).
+- **Reviewed and corrected** every AI output — pagination skip semantics, repository caching, Hebrew RTL, haptics, and settings persistence.
+- **Verified** with `⌘B` / `⌘U` and full manual flows on simulator (login, CRUD, delete messages, favorites undo, offline, theme/language).
 
 ### How correctness and quality were verified
 
