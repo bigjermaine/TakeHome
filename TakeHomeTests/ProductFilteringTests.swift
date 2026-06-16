@@ -87,7 +87,25 @@ final class ProductFilteringTests: XCTestCase {
         XCTAssertEqual(result.map(\.id), [2])
     }
 
-    func testApply_allCategoryIgnoresCategoryFilter() {
+    func testSort_ordersByPriceAscending() {
+        let result = ProductFiltering.sort(
+            products: sampleProducts.filter { !$0.isDeleted },
+            by: .priceAscending
+        )
+
+        XCTAssertEqual(result.map(\.id), [1, 2])
+    }
+
+    func testSort_ordersByTitleDescending() {
+        let result = ProductFiltering.sort(
+            products: sampleProducts.filter { !$0.isDeleted },
+            by: .titleDescending
+        )
+
+        XCTAssertEqual(result.map(\.title), ["Beta Laptop", "Alpha Phone"])
+    }
+
+    func testApply_emptySearchQuery_returnsAllNonDeleted() {
         let result = ProductFiltering.apply(
             to: sampleProducts,
             searchQuery: nil,

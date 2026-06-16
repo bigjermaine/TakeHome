@@ -196,10 +196,18 @@ TakeHome/
 └── Resources/              # Localizable.xcstrings
 
 TakeHomeTests/
-├── Mocks/                  # One mock per file
+├── Mocks/                  # One mock per file (+ InMemoryKeychain)
 ├── AuthUseCaseTests.swift
+├── AuthRepositoryTests.swift
+├── KeychainStorageTests.swift
+├── LoginViewModelTests.swift
 ├── FavoritesUseCaseTests.swift
+├── FavoritesViewModelTests.swift
 ├── ProductUseCaseTests.swift
+├── ProductListViewModelTests.swift
+├── AppRouterTests.swift
+├── SettingsUseCaseTests.swift
+├── ProductMapperTests.swift
 ├── ProductFilteringTests.swift
 ├── ProductEntityTests.swift
 └── PaginationTests.swift
@@ -209,14 +217,22 @@ TakeHomeTests/
 
 ## Testing
 
-Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`.
+Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`. The suite covers domain use cases, repositories, ViewModels, navigation, filtering, pagination, and keychain persistence (~70+ tests).
 
 | Test file | Coverage |
 |-----------|----------|
 | `AuthUseCaseTests` | Login, logout, session, biometrics (success/unavailable/failed), `AuthError` |
+| `AuthRepositoryTests` | Credential validation, session save/load/clear via in-memory keychain |
+| `KeychainStorageTests` | `InMemoryKeychain` + isolated `KeychainService` round-trip |
 | `FavoritesUseCaseTests` | Fetch, add, remove, nil remove |
-| `ProductUseCaseTests` | Fetch, cache, save, **delete**, reset, categories |
-| `ProductFilteringTests` | Deleted filter, category, search, brand, sort |
+| `FavoritesViewModelTests` | Load, remove + undo, open detail navigation |
+| `ProductUseCaseTests` | Fetch, cache, save, delete, reset, categories |
+| `ProductListViewModelTests` | Initial load, pagination, favorites toggle, reset, navigation |
+| `LoginViewModelTests` | Validation, successful login, biometry icon, presentation mode |
+| `AppRouterTests` | Delete confirmation, navigation paths, tab selection |
+| `SettingsUseCaseTests` | Load/update theme, language, haptics, biometrics preference |
+| `ProductMapperTests` | DTO defaults, URL parsing, SwiftData record mapping |
+| `ProductFilteringTests` | Deleted filter, category, search, brand, all sort options |
 | `ProductEntityTests` | `isAvailable`, `ProductPage.hasMore` |
 | `PaginationTests` | `PageRequest`, `PaginatedResult` |
 
@@ -267,24 +283,34 @@ Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`.
 
 Per assignment requirements: AI tools were used during development. The candidate remains responsible for the final implementation and code quality.
 
-| Item | Details |
-|------|---------|
-| **Tool** | Cursor (Claude) |
-| **Assisted with** | Architecture scaffolding, file organization, Nuke integration, localization, navigation, delete flow, README, unit tests |
-| **Manual review** | Repository merge logic, pagination, auth/session, offline caching, delete confirmation UX, build and test verification |
+### Work split (~70% AI-assisted / ~30% manual)
 
-### Prompts used (3+ meaningful prompts)
+| Share | What was done |
+|-------|----------------|
+| **~70% AI-assisted** | Initial Clean Architecture scaffolding, folder/file organization, Nuke image pipeline wiring, localization catalog setup, navigation router structure, bulk unit-test expansion (use cases, ViewModels, router, keychain), README drafting, and iterative bug fixes (delete alert presentation, navigation pop, Swift 6 `@MainActor` test isolation) |
+| **~30% manual** | Product requirements interpretation, repository merge/pagination logic review, auth/session flow decisions, offline cache behavior, delete confirmation UX and copy (EN/HE), favorites undo timing, settings defaults, manual device/simulator verification, test failure triage, and final code review before submission |
+
+### Prompts used (meaningful examples)
 
 1. **Architecture:** "Structure the take-home app with Clean Architecture + MVVM, route-based navigation, and separate Domain/Data/Platform layers."
 2. **Organization:** "Split large view files into subfolders per screen; put ViewModels in their own folders; split mocks into separate test files."
-3. **Delete UX:** "Restore local product delete with confirmation messages; present alert from tab root so it works inside NavigationStack."
-4. **Documentation:** "Update README to match assignment PDF standards and expand unit testing."
+3. **Delete UX:** "Restore local product delete with confirmation messages; present alert from tab root so it works inside NavigationStack; different messages for local-only vs API products."
+4. **Testing:** "Raise unit test coverage to submission quality — add ViewModel tests, AuthRepository/keychain tests, AppRouter navigation tests, and mapper tests."
+5. **Documentation:** "Update README to match assignment PDF standards; document the ~70/30 AI/manual split with concrete prompts and verification steps."
+
+### Manual intervention (what I changed or verified after AI output)
+
+- Confirmed DummyJSON pagination semantics and adjusted skip/limit handling for local-only products on page one.
+- Reworked delete flow: confirmation alert on `MainTabView`, pop via `AppRouter` instead of `dismiss()`, separate bindings so confirm action retains product ID.
+- Chose soft-delete for API products vs hard-delete for local-only items; wrote user-facing confirmation strings.
+- Reviewed Keychain session encoding, biometric unlock gating, and offline banner behavior on real network toggles.
+- Ran `⌘B` / `⌘U` in Xcode, fixed Swift 6 MainActor isolation in tests, and spot-checked login, CRUD, favorites undo, Hebrew RTL, and theme switching on simulator.
 
 ### How correctness and quality were verified
 
-- Xcode build of the `TakeHome` target
-- `TakeHomeTests` unit suite (`⌘U`)
-- Manual flows: login, biometrics, products (CRUD + reset), favorites (undo), settings, offline cache, delete confirmation messages (EN/HE)
+- Xcode build of the `TakeHome` target (`⌘B`)
+- `TakeHomeTests` unit suite (`⌘U`) — use cases, repositories, ViewModels, router, filtering, pagination, keychain
+- Manual flows: login (`demo` / `password123`), biometrics, products (CRUD + reset + delete confirmations), favorites (swipe + undo), settings (theme/language/logout), offline cache, EN/HE strings
 
 ---
 

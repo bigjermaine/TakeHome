@@ -16,11 +16,11 @@ final class AuthRepository: AuthRepositoryProtocol, @unchecked Sendable {
         static let sessionAccount = "auth.session"
     }
 
-    private let keychain: KeychainService
+    private let keychain: KeychainStoring
     private let validUsername = "demo"
     private let validPassword = "password123"
 
-    init(keychain: KeychainService) {
+    init(keychain: KeychainStoring) {
         self.keychain = keychain
     }
 

@@ -6,8 +6,9 @@
 //
 
 import Foundation
+@testable import TakeHome
 
-final class InMemoryKeychain: @unchecked Sendable {
+final class InMemoryKeychain: KeychainStoring, @unchecked Sendable {
     private var storage: [String: Data] = [:]
 
     func save(_ data: Data, account: String) throws {

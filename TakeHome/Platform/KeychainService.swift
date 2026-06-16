@@ -8,7 +8,13 @@
 import Foundation
 import Security
 
-final class KeychainService: Sendable {
+protocol KeychainStoring: Sendable {
+    func save(_ data: Data, account: String) throws
+    func read(account: String) throws -> Data?
+    func delete(account: String) throws
+}
+
+final class KeychainService: KeychainStoring, Sendable {
     private let service: String
 
     init(service: String = "com.takehome.TakeHome") {
