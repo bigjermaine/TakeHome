@@ -2,6 +2,8 @@
 
 A small iOS shop app built for the **iOS Swift Take-Home Assignment**. The focus is clean architecture, scalability, maintainability, and modern Swift—not pixel-perfect UI.
 
+watch demo here (https://drive.google.com/file/d/1iCGJ4eqMw6wiIHdAuUCTMRPpNRQ8GAz8/view?usp=sharing)
+
 | | |
 |---|---|
 | **API** | [DummyJSON Products](https://dummyjson.com/products) |
