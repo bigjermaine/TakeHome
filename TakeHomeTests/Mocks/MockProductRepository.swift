@@ -8,7 +8,8 @@
 import Foundation
 @testable import TakeHome
 
-final class MockProductRepository: ProductRepositoryProtocol, @unchecked Sendable {
+@MainActor
+final class MockProductRepository: ProductRepositoryProtocol {
     var cachedProductsResult: [Product] = []
     var fetchProductsResult: ProductPage = ProductPage(
         products: [],

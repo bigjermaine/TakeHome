@@ -2,13 +2,11 @@
 //  BiometricAuthenticator.swift
 //  TakeHome
 //
-//  Created by jermaine daniel on 15/06/2026.
-//
 
 import Foundation
 import LocalAuthentication
 
-final class BiometricAuthenticator: BiometricAuthProtocol, @unchecked Sendable {
+struct BiometricAuthenticator: BiometricAuthProtocol, Sendable {
     var canEvaluateBiometrics: Bool {
         var error: NSError?
         return LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)

@@ -8,7 +8,8 @@
 import Foundation
 @testable import TakeHome
 
-final class MockBiometricAuth: BiometricAuthProtocol, @unchecked Sendable {
+@MainActor
+final class MockBiometricAuth: BiometricAuthProtocol {
     var canEvaluateBiometrics = true
     var biometryName = "Face ID"
     var authenticateResult: Result<Void, Error> = .success(())

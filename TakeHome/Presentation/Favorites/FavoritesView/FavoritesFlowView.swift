@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoritesFlowView: View {
-    let container: DIContainer
+    let products: ProductModule
     @ObservedObject var viewModel: FavoritesViewModel
     @EnvironmentObject private var router: AppRouter
 
@@ -24,12 +24,12 @@ struct FavoritesFlowView: View {
                     switch route {
                     case .detail(let productID):
                         ProductDetailView(
-                            viewModel: container.makeProductDetailViewModel(productID: productID)
+                            viewModel: products.makeProductDetailViewModel(productID: productID)
                         )
                         .id(productID)
                     case .editor(let productID):
                         ProductEditorView(
-                            viewModel: container.makeProductEditorViewModel(productID: productID)
+                            viewModel: products.makeProductEditorViewModel(productID: productID)
                         )
                     }
                 }

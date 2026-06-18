@@ -11,8 +11,8 @@ import XCTest
 @MainActor
 final class ProductListViewModelTests: XCTestCase {
     private func makeViewModel(
-        productRepository: MockProductRepository = MockProductRepository(),
-        favoritesRepository: MockFavoritesRepository = MockFavoritesRepository()
+        productRepository: MockProductRepository,
+        favoritesRepository: MockFavoritesRepository
     ) -> (ProductListViewModel, DIContainer, MockProductRepository) {
         let container = DIContainer()
         let viewModel = ProductListViewModel(
@@ -36,7 +36,10 @@ final class ProductListViewModelTests: XCTestCase {
         )
         productRepository.categoriesResult = ["smartphones", "laptops"]
 
-        let (viewModel, _, _) = makeViewModel(productRepository: productRepository)
+        let (viewModel, _, _) = makeViewModel(
+            productRepository: productRepository,
+            favoritesRepository: MockFavoritesRepository()
+        )
         await viewModel.loadInitially()
 
         XCTAssertEqual(viewModel.products.map(\.id), [1, 2])
@@ -47,7 +50,10 @@ final class ProductListViewModelTests: XCTestCase {
 
     func testToggleFavorite_updatesFavoriteIDs() throws {
         let favoritesRepository = MockFavoritesRepository()
-        let (viewModel, _, _) = makeViewModel(favoritesRepository: favoritesRepository)
+        let (viewModel, _, _) = makeViewModel(
+            productRepository: MockProductRepository(),
+            favoritesRepository: favoritesRepository
+        )
 
         viewModel.toggleFavorite(productID: 7)
         XCTAssertTrue(viewModel.isFavorite(productID: 7))
@@ -57,7 +63,10 @@ final class ProductListViewModelTests: XCTestCase {
     }
 
     func testOpenDetail_navigatesOnProductsTab() {
-        let (viewModel, container, _) = makeViewModel()
+        let (viewModel, container, _) = makeViewModel(
+            productRepository: MockProductRepository(),
+            favoritesRepository: MockFavoritesRepository()
+        )
 
         viewModel.openDetail(productID: 3)
 
@@ -65,7 +74,7 @@ final class ProductListViewModelTests: XCTestCase {
         XCTAssertEqual(container.appRouter.productPath.count, 1)
     }
 
-    func testResetLocalChanges_refreshesCatalog() async {
+    func testResetLocalChanges_refreshesCatalog() async     {
         let productRepository = MockProductRepository()
         productRepository.fetchProductsResult = ProductPage(
             products: [Product.fixture(id: 1)],
@@ -74,7 +83,10 @@ final class ProductListViewModelTests: XCTestCase {
             limit: 20
         )
 
-        let (viewModel, _, repository) = makeViewModel(productRepository: productRepository)
+        let (viewModel, _, repository) = makeViewModel(
+            productRepository: productRepository,
+            favoritesRepository: MockFavoritesRepository()
+        )
         await viewModel.resetLocalChanges()
 
         XCTAssertTrue(repository.resetLocalChangesCalled)
@@ -91,7 +103,10 @@ final class ProductListViewModelTests: XCTestCase {
             limit: 20
         )
 
-        let (viewModel, _, repository) = makeViewModel(productRepository: productRepository)
+        let (viewModel, _, repository) = makeViewModel(
+            productRepository: productRepository,
+            favoritesRepository: MockFavoritesRepository()
+        )
         await viewModel.loadInitially()
 
         repository.fetchProductsResult = ProductPage(

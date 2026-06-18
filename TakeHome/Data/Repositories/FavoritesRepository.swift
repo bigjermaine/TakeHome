@@ -23,7 +23,7 @@ final class FavoritesRepository: FavoritesRepositoryProtocol {
     func fetchFavorites() throws -> [Product] {
         let ids = try favoritesLocalDataSource.favoriteIDs()
         return ids.compactMap { id in
-            guard let record = try? productLocalDataSource.record(id: id), !record.isDeleted else {
+            guard let record = try? productLocalDataSource.record(id: id), !record.isCatalogHidden else {
                 return nil
             }
             return ProductMapper.map(record)

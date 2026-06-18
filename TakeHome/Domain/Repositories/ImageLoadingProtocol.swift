@@ -16,6 +16,6 @@ typealias PlatformImage = NSImage
 #endif
 
 protocol ImageLoadingProtocol: Sendable {
-    func prefetch(urls: [URL])
-    func cancelPrefetch(urls: [URL])
+    func prefetch(urls: [URL]) async
+    func cancelPrefetch(urls: [URL]) async
 }

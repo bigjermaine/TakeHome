@@ -11,9 +11,9 @@ import XCTest
 @MainActor
 final class LoginViewModelTests: XCTestCase {
     private func makeViewModel(
-        authRepository: MockAuthRepository = MockAuthRepository(),
-        biometrics: MockBiometricAuth = MockBiometricAuth(),
-        settings: MockSettingsRepository = MockSettingsRepository()
+        authRepository: MockAuthRepository,
+        biometrics: MockBiometricAuth,
+        settings: MockSettingsRepository
     ) -> (LoginViewModel, DIContainer) {
         let container = DIContainer()
         let loginUseCase = LoginUseCase(authRepository: authRepository)
@@ -31,7 +31,11 @@ final class LoginViewModelTests: XCTestCase {
     }
 
     func testIsLoginEnabled_requiresUsernamePasswordAndNotLoading() {
-        let (viewModel, _) = makeViewModel()
+        let (viewModel, _) = makeViewModel(
+            authRepository: MockAuthRepository(),
+            biometrics: MockBiometricAuth(),
+            settings: MockSettingsRepository()
+        )
 
         viewModel.username = ""
         viewModel.password = ""
@@ -43,7 +47,11 @@ final class LoginViewModelTests: XCTestCase {
     }
 
     func testLogin_emptyUsername_setsValidationError() async {
-        let (viewModel, container) = makeViewModel()
+        let (viewModel, container) = makeViewModel(
+            authRepository: MockAuthRepository(),
+            biometrics: MockBiometricAuth(),
+            settings: MockSettingsRepository()
+        )
         viewModel.username = "   "
         viewModel.password = "password123"
 
@@ -54,7 +62,11 @@ final class LoginViewModelTests: XCTestCase {
     }
 
     func testLogin_emptyPassword_setsValidationError() async {
-        let (viewModel, container) = makeViewModel()
+        let (viewModel, container) = makeViewModel(
+            authRepository: MockAuthRepository(),
+            biometrics: MockBiometricAuth(),
+            settings: MockSettingsRepository()
+        )
         viewModel.username = "demo"
         viewModel.password = ""
 
@@ -65,7 +77,11 @@ final class LoginViewModelTests: XCTestCase {
     }
 
     func testLogin_success_navigatesToMain() async {
-        let (viewModel, container) = makeViewModel()
+        let (viewModel, container) = makeViewModel(
+            authRepository: MockAuthRepository(),
+            biometrics: MockBiometricAuth(),
+            settings: MockSettingsRepository()
+        )
         viewModel.username = "demo"
         viewModel.password = "password123"
 
@@ -78,7 +94,11 @@ final class LoginViewModelTests: XCTestCase {
     func testLogin_invalidCredentials_setsErrorState() async {
         let repository = MockAuthRepository()
         repository.loginResult = .failure(AuthError.invalidCredentials)
-        let (viewModel, container) = makeViewModel(authRepository: repository)
+        let (viewModel, container) = makeViewModel(
+            authRepository: repository,
+            biometrics: MockBiometricAuth(),
+            settings: MockSettingsRepository()
+        )
         viewModel.username = "bad"
         viewModel.password = "bad"
 
@@ -89,7 +109,11 @@ final class LoginViewModelTests: XCTestCase {
     }
 
     func testPrepareForPresentation_signIn_clearsFields() {
-        let (viewModel, _) = makeViewModel()
+        let (viewModel, _) = makeViewModel(
+            authRepository: MockAuthRepository(),
+            biometrics: MockBiometricAuth(),
+            settings: MockSettingsRepository()
+        )
         viewModel.username = "demo"
         viewModel.password = "password123"
 
@@ -104,7 +128,11 @@ final class LoginViewModelTests: XCTestCase {
     func testBiometrySystemImage_matchesBiometryName() {
         let biometrics = MockBiometricAuth()
         biometrics.biometryName = "Face ID"
-        let (viewModel, _) = makeViewModel(biometrics: biometrics)
+        let (viewModel, _) = makeViewModel(
+            authRepository: MockAuthRepository(),
+            biometrics: biometrics,
+            settings: MockSettingsRepository()
+        )
 
         viewModel.refreshBiometricAvailability()
 

@@ -25,6 +25,13 @@ struct ProductsResponseDTO: Decodable {
     let total: Int
     let skip: Int
     let limit: Int
+
+    init(products: [ProductDTO], total: Int, skip: Int, limit: Int) {
+        self.products = products
+        self.total = total
+        self.skip = skip
+        self.limit = limit
+    }
 }
 
 struct SingleProductResponseDTO: Decodable {
@@ -90,7 +97,7 @@ enum ProductMapper {
             rating: record.rating,
             stock: record.stock,
             isLocalOnly: record.isLocalOnly,
-            isDeleted: record.isDeleted
+            isDeleted: record.isCatalogHidden
         )
     }
 }

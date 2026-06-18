@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProductsFlowView: View {
-    let container: DIContainer
+    let products: ProductModule
     @ObservedObject var viewModel: ProductListViewModel
     @EnvironmentObject private var router: AppRouter
 
@@ -24,12 +24,12 @@ struct ProductsFlowView: View {
                     switch route {
                     case .detail(let productID):
                         ProductDetailView(
-                            viewModel: container.makeProductDetailViewModel(productID: productID)
+                            viewModel: products.makeProductDetailViewModel(productID: productID)
                         )
                         .id(productID)
                     case .editor(let productID):
                         ProductEditorView(
-                            viewModel: container.makeProductEditorViewModel(productID: productID)
+                            viewModel: products.makeProductEditorViewModel(productID: productID)
                         )
                     }
                 }

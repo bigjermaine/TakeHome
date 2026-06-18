@@ -2,8 +2,6 @@
 //  AppRouter.swift
 //  TakeHome
 //
-//  Created by jermaine daniel on 15/06/2026.
-//
 
 import Foundation
 import SwiftUI
@@ -20,16 +18,16 @@ final class AppRouter: ObservableObject {
     @Published var deleteConfirmationProductID: Int?
     @Published var deleteConfirmationIsLocalOnly = false
 
-    private let container: DIContainer
+    private let dependencies: AppRouterDependencyProviding
     private var needsUnlockAfterBackground = false
     private var activeDetailPath: TabRoute?
 
-    init(container: DIContainer) {
-        self.container = container
+    init(dependencies: AppRouterDependencyProviding) {
+        self.dependencies = dependencies
     }
 
     var isBiometricAuthAvailable: Bool {
-        container.isBiometricAuthAvailable
+        dependencies.isBiometricAuthAvailable
     }
 
     func bootstrap() async {
@@ -102,17 +100,17 @@ final class AppRouter: ObservableObject {
 
     func confirmDeleteProduct(productID: Int) async {
         do {
-            try await container.deleteProductUseCase.execute(id: productID)
+            try await dependencies.deleteProductUseCase.execute(id: productID)
             popProductDetail(for: productID)
             HapticFeedback.play(.success)
         } catch {
-            container.makeProductDetailViewModel(productID: productID).showError(error.localizedDescription)
+            dependencies.makeProductDetailViewModel(productID: productID).showError(error.localizedDescription)
             HapticFeedback.play(.error)
         }
     }
 
     func popProductDetail(for productID: Int) {
-        container.invalidateProductDetailViewModel(productID: productID)
+        dependencies.invalidateProductDetailViewModel(productID: productID)
 
         switch activeDetailPath {
         case .favorites:
@@ -126,7 +124,7 @@ final class AppRouter: ObservableObject {
         }
 
         activeDetailPath = nil
-        container.makeProductListViewModel().reloadFromCache()
+        dependencies.makeProductListViewModel().reloadFromCache()
         refreshFavorites()
     }
 
@@ -138,31 +136,31 @@ final class AppRouter: ObservableObject {
     }
 
     func refreshFavorites() {
-        container.makeFavoritesViewModel().load()
+        dependencies.makeFavoritesViewModel().load()
     }
 
     func logout() async {
-        try? container.logoutUseCase.execute()
+        try? dependencies.logoutUseCase.execute()
         showLogin()
     }
 
     private var hasStoredSession: Bool {
-        (try? container.validateSessionUseCase.execute()) != nil
+        (try? dependencies.validateSessionUseCase.execute()) != nil
     }
 
     private func shouldRequireBiometricUnlock() -> Bool {
-        container.loadSettingsUseCase.requireBiometricsOnLaunch()
+        dependencies.loadSettingsUseCase.requireBiometricsOnLaunch()
     }
 
     private func presentSignIn() {
         loginMode = .signIn
         appRoute = .login
-        container.makeLoginViewModel().prepareForPresentation(mode: .signIn)
+        dependencies.makeLoginViewModel().prepareForPresentation(mode: .signIn)
     }
 
     private func presentUnlock() {
         loginMode = .unlock
         appRoute = .login
-        container.makeLoginViewModel().prepareForPresentation(mode: .unlock)
+        dependencies.makeLoginViewModel().prepareForPresentation(mode: .unlock)
     }
 }

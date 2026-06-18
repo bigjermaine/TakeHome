@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct MainTabView: View {
-    let container: DIContainer
+    let products: ProductModule
+    let favorites: FavoritesModule
     @EnvironmentObject private var router: AppRouter
     @EnvironmentObject private var preferences: AppPreferencesStore
 
     var body: some View {
         TabView(selection: $router.selectedTab) {
             ProductsFlowView(
-                container: container,
-                viewModel: container.makeProductListViewModel()
+                products: products,
+                viewModel: products.makeProductListViewModel()
             )
             .tabItem {
                 Label("Products", systemImage: "square.grid.2x2")
@@ -24,8 +25,8 @@ struct MainTabView: View {
             .tag(TabRoute.products)
 
             FavoritesFlowView(
-                container: container,
-                viewModel: container.makeFavoritesViewModel()
+                products: products,
+                viewModel: favorites.makeFavoritesViewModel()
             )
                 .tabItem {
                     Label("Favorites", systemImage: "heart")

@@ -2,24 +2,33 @@
 //  InMemoryKeychain.swift
 //  TakeHomeTests
 //
-//  Created by jermaine daniel on 15/06/2026.
-//
 
 import Foundation
 @testable import TakeHome
 
-final class InMemoryKeychain: KeychainStoring, @unchecked Sendable {
-    private var storage: [String: Data] = [:]
+struct InMemoryKeychain: KeychainStoring, Sendable {
+    private final class Storage: @unchecked Sendable {
+        let lock = NSLock()
+        var values: [String: Data] = [:]
+    }
+
+    private let storage = Storage()
 
     func save(_ data: Data, account: String) throws {
-        storage[account] = data
+        storage.lock.lock()
+        defer { storage.lock.unlock() }
+        storage.values[account] = data
     }
 
     func read(account: String) throws -> Data? {
-        storage[account]
+        storage.lock.lock()
+        defer { storage.lock.unlock() }
+        return storage.values[account]
     }
 
     func delete(account: String) throws {
-        storage.removeValue(forKey: account)
+        storage.lock.lock()
+        defer { storage.lock.unlock() }
+        storage.values.removeValue(forKey: account)
     }
 }

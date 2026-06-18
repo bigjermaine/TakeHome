@@ -58,7 +58,7 @@ final class ProductLocalDataSource {
     func upsertMany(_ products: [Product]) throws {
         for product in products {
             if let existing = try record(id: product.id) {
-                if existing.isLocalOnly || existing.isDeleted {
+                if existing.isLocalOnly || existing.isCatalogHidden {
                     continue
                 }
                 existing.apply(product)
@@ -92,7 +92,7 @@ final class ProductLocalDataSource {
         if record.isLocalOnly {
             modelContext.delete(record)
         } else {
-            record.isDeleted = true
+            record.isCatalogHidden = true
             record.updatedAt = .now
         }
         try modelContext.save()
@@ -100,7 +100,7 @@ final class ProductLocalDataSource {
 
     func resetLocalChanges() throws {
         let records = try allRecords()
-        for record in records where record.isLocalOnly || record.isDeleted {
+        for record in records where record.isLocalOnly || record.isCatalogHidden {
             modelContext.delete(record)
         }
         try modelContext.save()
@@ -113,6 +113,6 @@ final class ProductLocalDataSource {
     }
 
     func categories() throws -> [String] {
-        Array(Set(try allRecords().filter { !$0.isDeleted }.map(\.category))).sorted()
+        Array(Set(try allRecords().filter { !$0.isCatalogHidden }.map(\.category))).sorted()
     }
 }

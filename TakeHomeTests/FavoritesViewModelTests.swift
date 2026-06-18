@@ -11,7 +11,7 @@ import XCTest
 @MainActor
 final class FavoritesViewModelTests: XCTestCase {
     private func makeViewModel(
-        favoritesRepository: MockFavoritesRepository = MockFavoritesRepository()
+        favoritesRepository: MockFavoritesRepository
     ) -> (FavoritesViewModel, DIContainer, MockFavoritesRepository) {
         let container = DIContainer()
         let fetchUseCase = FetchFavoritesUseCase(favoritesRepository: favoritesRepository)
@@ -69,7 +69,7 @@ final class FavoritesViewModelTests: XCTestCase {
     }
 
     func testOpenDetail_navigatesOnFavoritesTab() {
-        let (viewModel, container, _) = makeViewModel()
+        let (viewModel, container, _) = makeViewModel(favoritesRepository: MockFavoritesRepository())
 
         viewModel.openDetail(productID: 9)
 

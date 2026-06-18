@@ -54,7 +54,7 @@ final class ProductDetailViewModel: ObservableObject {
             guard !Task.isCancelled else { return }
 
             isFavorite = (try? toggleFavoriteUseCase.isFavorite(productID: productID)) ?? false
-            imageLoader.prefetch(urls: product.imageURLs)
+            await imageLoader.prefetch(urls: product.imageURLs)
             viewState = .loaded(product)
         } catch is CancellationError {
             guard !isRefresh else { return }

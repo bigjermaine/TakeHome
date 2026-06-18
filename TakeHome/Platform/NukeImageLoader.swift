@@ -2,13 +2,11 @@
 //  NukeImageLoader.swift
 //  TakeHome
 //
-//  Created by jermaine daniel on 15/06/2026.
-//
 
 import Foundation
 import Nuke
 
-final class NukeImageLoader: ImageLoadingProtocol, @unchecked Sendable {
+actor NukeImageLoader: ImageLoadingProtocol {
     private let prefetcher: ImagePrefetcher
 
     init(pipeline: ImagePipeline = .shared) {

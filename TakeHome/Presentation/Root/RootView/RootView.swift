@@ -18,13 +18,16 @@ struct RootView: View {
             switch router.appRoute {
             case .login:
                 LoginViewControllerWrapper(
-                    viewModel: container.makeLoginViewModel(),
+                    viewModel: container.auth.makeLoginViewModel(),
                     locale: preferences.locale,
                     loginMode: router.loginMode
                 )
                 .ignoresSafeArea()
             case .main:
-                MainTabView(container: container)
+                MainTabView(
+                    products: container.products,
+                    favorites: container.favorites
+                )
             }
         }
         .preferredColorScheme(preferences.preferredColorScheme)

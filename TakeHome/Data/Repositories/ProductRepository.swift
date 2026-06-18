@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ProductRepositoryError: LocalizedError {
+enum ProductRepositoryError: LocalizedError, Equatable {
     case productNotFound
 
     var errorDescription: String? {
@@ -20,11 +20,11 @@ enum ProductRepositoryError: LocalizedError {
 
 @MainActor
 final class ProductRepository: ProductRepositoryProtocol {
-    private let remoteDataSource: ProductRemoteDataSource
+    private let remoteDataSource: ProductRemoteDataSourcing
     private let localDataSource: ProductLocalDataSource
 
     init(
-        remoteDataSource: ProductRemoteDataSource,
+        remoteDataSource: ProductRemoteDataSourcing,
         localDataSource: ProductLocalDataSource
     ) {
         self.remoteDataSource = remoteDataSource
@@ -77,7 +77,7 @@ final class ProductRepository: ProductRepositoryProtocol {
         if skip == 0 {
             let apiIDs = Set(displayProducts.map(\.id))
             let createdLocally = try localDataSource.allRecords()
-                .filter { $0.isLocalOnly && !$0.isDeleted && $0.id < 0 && !apiIDs.contains($0.id) }
+                .filter { $0.isLocalOnly && !$0.isCatalogHidden && $0.id < 0 && !apiIDs.contains($0.id) }
                 .map(ProductMapper.map)
             displayProducts = createdLocally + displayProducts
 

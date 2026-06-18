@@ -8,7 +8,8 @@
 import Foundation
 @testable import TakeHome
 
-final class MockFavoritesRepository: FavoritesRepositoryProtocol, @unchecked Sendable {
+@MainActor
+final class MockFavoritesRepository: FavoritesRepositoryProtocol {
     var favorites: [Product] = []
     private var favoriteIDs: Set<Int> = []
 

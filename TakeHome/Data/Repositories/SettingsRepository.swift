@@ -2,12 +2,10 @@
 //  SettingsRepository.swift
 //  TakeHome
 //
-//  Created by jermaine daniel on 15/06/2026.
-//
 
 import Foundation
 
-final class SettingsRepository: SettingsRepositoryProtocol, @unchecked Sendable {
+struct SettingsRepository: SettingsRepositoryProtocol, Sendable {
     private enum Keys {
         static let theme = "settings.theme"
         static let language = "settings.language"
@@ -15,10 +13,17 @@ final class SettingsRepository: SettingsRepositoryProtocol, @unchecked Sendable 
         static let requireBiometricsOnLaunch = "settings.requireBiometricsOnLaunch"
     }
 
-    private let defaults: UserDefaults
+    private let defaultsSuiteName: String?
 
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
+    init(defaultsSuiteName: String? = nil) {
+        self.defaultsSuiteName = defaultsSuiteName
+    }
+
+    private var defaults: UserDefaults {
+        if let defaultsSuiteName, let suite = UserDefaults(suiteName: defaultsSuiteName) {
+            return suite
+        }
+        return .standard
     }
 
     func theme() -> AppTheme {
@@ -67,5 +72,3 @@ final class SettingsRepository: SettingsRepositoryProtocol, @unchecked Sendable 
         defaults.set(required, forKey: Keys.requireBiometricsOnLaunch)
     }
 }
-
-

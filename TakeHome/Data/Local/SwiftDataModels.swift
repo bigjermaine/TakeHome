@@ -21,7 +21,7 @@ final class ProductRecord {
     var rating: Double
     var stock: Int
     var isLocalOnly: Bool
-    var isDeleted: Bool
+    var isCatalogHidden: Bool
     var updatedAt: Date
 
     init(
@@ -50,7 +50,7 @@ final class ProductRecord {
         self.rating = rating
         self.stock = stock
         self.isLocalOnly = isLocalOnly
-        self.isDeleted = isDeleted
+        self.isCatalogHidden = isDeleted
         self.updatedAt = updatedAt
     }
 
@@ -65,7 +65,7 @@ final class ProductRecord {
         rating = product.rating
         stock = product.stock
         isLocalOnly = product.isLocalOnly
-        isDeleted = product.isDeleted
+        isCatalogHidden = product.isDeleted
         updatedAt = .now
     }
 }

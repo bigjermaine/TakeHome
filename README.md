@@ -95,7 +95,7 @@ Deleting from the product detail screen removes the item from your **local catal
 | Product type | What happens |
 |--------------|--------------|
 | **Locally created** (`isLocalOnly`) | Permanently removed from SwiftData |
-| **From DummyJSON** | Soft-deleted locally (`isDeleted = true`); hidden from list until **Reset** restores the API catalog |
+| **From DummyJSON** | Soft-deleted locally (`isCatalogHidden = true` on `ProductRecord`); hidden from list until **Reset** restores the API catalog |
 
 Confirmation messages (English + Hebrew):
 
@@ -116,12 +116,12 @@ The delete confirmation is presented from `MainTabView` (not inside navigation) 
 | UI | SwiftUI + UIKit | SwiftUI tabs/lists; UIKit login screen |
 | Architecture | MVVM / MVI / TCA | **MVVM** + Clean Architecture |
 | Async | async/await, Task | API calls, ViewModel tasks |
-| DI | Constructor injection / container | `DIContainer` with lazy use cases |
+| DI | Constructor injection / container | Feature-scoped modules composed by `DIContainer` |
 | Networking | URLSession + Codable | `APIClient` |
 | Local storage | SwiftData, UserDefaults, Keychain | SwiftData products/favorites; Keychain session; UserDefaults settings |
 | Pagination | Manual cursor/limit | `PageRequest`, skip/limit paging |
 | Images | AsyncImage / Nuke | **Nuke** + disk cache + prefetch |
-| Testing | XCTest (XCUITest optional) | **38+ unit tests** in `TakeHomeTests` |
+| Testing | XCTest (XCUITest optional) | **90+ unit tests** in `TakeHomeTests` |
 
 ---
 
@@ -152,6 +152,20 @@ Platform
 | **Data** | DummyJSON API, SwiftData persistence, repository implementations |
 | **Platform** | Keychain, biometrics, network reachability, Nuke pipeline |
 
+### Dependency injection
+
+`DIContainer` is a thin composition root that wires feature-scoped modules:
+
+| Module | Responsibility |
+|--------|----------------|
+| `AppInfrastructure` | SwiftData container, Nuke pipeline, network monitor |
+| `AuthModule` | Auth repositories/use cases, login ViewModel factory |
+| `ProductModule` | Product repositories/use cases, list/detail/editor ViewModel factories |
+| `FavoritesModule` | Favorites repositories/use cases, favorites ViewModel factory |
+| `SettingsModule` | Settings repositories/use cases, `AppPreferencesStore` |
+
+`AppRouter` depends on `AppRouterDependencyProviding` (implemented by `DIContainer`) instead of the full container surface. Product and favorites flows receive `ProductModule` rather than the root container.
+
 ### Navigation
 
 - `AppRoute` — login vs main app
@@ -172,7 +186,7 @@ Platform
 
 ```
 TakeHome/
-├── App/                    # DIContainer, AppPreferencesStore, AppLocalization
+├── App/                    # DIContainer, feature modules, AppPreferencesStore, AppLocalization
 ├── Domain/
 │   ├── Entities/
 │   ├── UseCases/
@@ -203,6 +217,7 @@ TakeHomeTests/
 ├── LoginViewModelTests.swift
 ├── FavoritesUseCaseTests.swift
 ├── FavoritesViewModelTests.swift
+├── ProductRepositoryTests.swift
 ├── ProductUseCaseTests.swift
 ├── ProductListViewModelTests.swift
 ├── AppRouterTests.swift
@@ -217,10 +232,11 @@ TakeHomeTests/
 
 ## Testing
 
-Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`. The suite covers domain use cases, repositories, ViewModels, navigation, filtering, pagination, and keychain persistence (~70+ tests).
+Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`. The suite covers domain use cases, repositories (including product merge logic), ViewModels, navigation, filtering, pagination, and keychain persistence (90 tests).
 
 | Test file | Coverage |
 |-----------|----------|
+| `ProductRepositoryTests` | API/local merge, soft delete, search merge, pagination prepend, CRUD, reset |
 | `AuthUseCaseTests` | Login, logout, session, biometrics (success/unavailable/failed), `AuthError` |
 | `AuthRepositoryTests` | Credential validation, session save/load/clear via in-memory keychain |
 | `KeychainStorageTests` | `InMemoryKeychain` + isolated `KeychainService` round-trip |

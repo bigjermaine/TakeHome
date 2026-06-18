@@ -8,7 +8,8 @@
 import Foundation
 @testable import TakeHome
 
-final class MockSettingsRepository: SettingsRepositoryProtocol, @unchecked Sendable {
+@MainActor
+final class MockSettingsRepository: SettingsRepositoryProtocol {
     var languageValue: AppLanguage = .english
     var themeValue: AppTheme = .system
     var hapticsValue = true

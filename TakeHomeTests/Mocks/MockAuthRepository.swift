@@ -8,7 +8,8 @@
 import Foundation
 @testable import TakeHome
 
-final class MockAuthRepository: AuthRepositoryProtocol, @unchecked Sendable {
+@MainActor
+final class MockAuthRepository: AuthRepositoryProtocol {
     var loginResult: Result<AuthSession, Error> = .success(
         AuthSession(username: "demo", token: "token", createdAt: .now)
     )
