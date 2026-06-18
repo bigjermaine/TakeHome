@@ -37,13 +37,13 @@ struct FavoritesView: View {
                         Button(role: .destructive) {
                             viewModel.remove(product: product)
                         } label: {
-                            Label("Remove", systemImage: "heart.slash")
+                            Label(localized("Remove"), systemImage: "heart.slash")
                         }
                     }
                 }
             }
         }
-        .navigationTitle("Favorites")
+        .localizedNavigationTitle(localized("Favorites"))
         .onAppear {
             viewModel.load()
         }
@@ -63,5 +63,9 @@ struct FavoritesView: View {
             }
         }
         .animation(.easeInOut, value: viewModel.undoAction)
+    }
+
+    private func localized(_ key: String) -> String {
+        AppLocalization.string(key, locale: locale)
     }
 }

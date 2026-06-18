@@ -73,12 +73,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text(localized("Settings"))
-            }
-        }
+        .localizedNavigationTitle(localized("Settings"))
     }
 
     private func localized(_ key: String) -> String {

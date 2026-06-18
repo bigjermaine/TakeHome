@@ -123,7 +123,7 @@ The delete confirmation is presented from `MainTabView` (not inside navigation) 
 | Local storage | SwiftData, UserDefaults, Keychain | SwiftData products/favorites; Keychain session; UserDefaults settings |
 | Pagination | Manual cursor/limit | `PageRequest`, skip/limit paging |
 | Images | AsyncImage / Nuke | **Nuke** + disk cache + prefetch |
-| Testing | XCTest (XCUITest optional) | **90+ unit tests** in `TakeHomeTests` |
+| Testing | XCTest (XCUITest optional) | **97+ unit tests** in `TakeHomeTests` |
 
 ---
 
@@ -166,7 +166,27 @@ Platform
 | `FavoritesModule` | Favorites repositories/use cases, favorites ViewModel factory |
 | `SettingsModule` | Settings repositories/use cases, `AppPreferencesStore` |
 
-`AppRouter` depends on `AppRouterDependencyProviding` (implemented by `DIContainer`) instead of the full container surface. Product and favorites flows receive `ProductModule` rather than the root container.
+`AppRouter` depends on `AppRouterDependencyProviding` (implemented by `DIContainer`) instead of the full container surface. Product and favorites flows receive `ProductModule` rather than the root container. `AuthModule` shares the same `SettingsRepository` instance as `SettingsModule`, so biometric preferences and in-app settings stay consistent.
+
+### Product merge architecture
+
+Offline catalog merge is split into two layers:
+
+| Layer | Role |
+|-------|------|
+| `ProductMergePolicy` (Domain) | Pure functions: remote/local resolution, page-0 prepend, search merge, dedupe, total count |
+| `ProductRepository` (Data) | Orchestrates API + SwiftData I/O, then delegates merge rules to the policy |
+
+`ProductMergePolicyTests` cover merge edge cases without SwiftData. `ProductRepositoryTests` prove the full integration path (16 tests).
+
+### Revision highlights (post-feedback)
+
+| Feedback area | What changed |
+|---------------|--------------|
+| **Complex business logic** | Extracted `ProductMergePolicy` + 7 pure unit tests + 16 repository integration tests for merge/conflict/CRUD |
+| **Scalable DI** | Feature modules (`AuthModule`, `ProductModule`, …), `AppRouterDependencyProviding`, shared settings repository |
+| **Concurrency safety** | Production `@unchecked Sendable` removed; struct/actor repositories and `actor NukeImageLoader` |
+| **Ownership signals** | Renamed `ProductRecord.isCatalogHidden` after finding SwiftData conflict with `isDeleted`; documented trade-offs |
 
 ### Navigation
 
@@ -194,7 +214,7 @@ TakeHome/
 │   ├── UseCases/
 │   ├── Repositories/       # Protocols
 │   ├── Pagination/
-│   └── Utilities/          # ProductFiltering
+│   └── Utilities/          # ProductFiltering, ProductMergePolicy
 ├── Data/
 │   ├── Remote/             # APIClient, ProductRemoteDataSource
 │   ├── Local/              # SwiftData models & data sources
@@ -215,7 +235,7 @@ TakeHomeTests/
 ├── Mocks/                  # Test doubles + fixtures
 ├── Domain/
 │   ├── Entities/           # ProductEntityTests
-│   ├── Utilities/          # ProductFilteringTests, PaginationTests
+│   ├── Utilities/          # ProductFilteringTests, ProductMergePolicyTests, PaginationTests
 │   └── UseCases/           # Auth, Favorites, Product, Settings use case tests
 ├── Data/
 │   ├── Repositories/       # AuthRepositoryTests, ProductRepositoryTests
@@ -232,11 +252,12 @@ TakeHomeTests/
 
 ## Testing
 
-Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`. The suite covers domain use cases, repositories (including product merge logic), ViewModels, navigation, filtering, pagination, and keychain persistence (90 tests).
+Unit tests use **XCTest** with mock repositories in `TakeHomeTests/Mocks/`. The suite covers domain use cases, merge policy, repositories, ViewModels, navigation, filtering, pagination, and keychain persistence (97 tests).
 
 | Test file | Coverage |
 |-----------|----------|
-| `ProductRepositoryTests` | API/local merge, soft delete, search merge, pagination prepend, CRUD, reset |
+| `ProductMergePolicyTests` | Pure merge rules: local/API conflict, prepend, search merge, dedupe, totals |
+| `ProductRepositoryTests` | API/local merge integration, soft delete, search, pagination, CRUD, reset |
 | `AuthUseCaseTests` | Login, logout, session, biometrics (success/unavailable/failed), `AuthError` |
 | `AuthRepositoryTests` | Credential validation, session save/load/clear via in-memory keychain |
 | `KeychainStorageTests` | `InMemoryKeychain` + isolated `KeychainService` round-trip |

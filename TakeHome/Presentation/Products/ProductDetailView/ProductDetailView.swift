@@ -80,8 +80,7 @@ struct ProductDetailView: View {
                 )
             }
         }
-        .navigationTitle("Details")
-        .navigationBarTitleDisplayMode(.inline)
+        .localizedNavigationTitle(localized("Details"))
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
@@ -120,5 +119,9 @@ struct ProductDetailView: View {
             guard newCount < oldCount, newCount > 0 else { return }
             Task { await viewModel.load() }
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        AppLocalization.string(key, locale: locale)
     }
 }

@@ -24,10 +24,10 @@ struct ProductListView: View {
             filtersSection
             contentSection
         }
-        .navigationTitle("Products")
+        .localizedNavigationTitle(localized("Products"))
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("Reset") {
+                Button(localized("Reset")) {
                     HapticFeedback.play(.warning)
                     Task { await viewModel.resetLocalChanges() }
                 }
@@ -41,7 +41,7 @@ struct ProductListView: View {
                 }
             }
         }
-        .searchable(text: $viewModel.searchQuery, prompt: Text("Search products"))
+        .searchable(text: $viewModel.searchQuery, prompt: Text(localized("Search products")))
         .onSubmit(of: .search) {
             Task { await viewModel.applyFilters() }
         }

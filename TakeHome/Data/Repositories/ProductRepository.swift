@@ -66,34 +66,34 @@ final class ProductRepository: ProductRepositoryProtocol {
         let remoteProducts = response.products.map { ProductMapper.map($0) }
         try localDataSource.upsertMany(remoteProducts)
 
-        var displayProducts = remoteProducts.compactMap { remote -> Product? in
-            if let local = try? localDataSource.record(id: remote.id) {
-                let mapped = ProductMapper.map(local)
-                return mapped.isDeleted ? nil : mapped
-            }
-            return remote
+        let allLocalProducts = try localDataSource.allRecords().map(ProductMapper.map)
+        let localByID = Dictionary(uniqueKeysWithValues: allLocalProducts.map { ($0.id, $0) })
+        var displayProducts = ProductMergePolicy.displayFromRemote(
+            remoteProducts,
+            localByID: localByID
+        )
+
+        displayProducts = ProductMergePolicy.prependFirstPageLocalOnly(
+            to: displayProducts,
+            localOnlyProducts: allLocalProducts,
+            skip: skip
+        )
+
+        if skip == 0, let searchQuery, !searchQuery.isEmpty {
+            let localMatches = try cachedProducts(
+                searchQuery: searchQuery,
+                category: category,
+                sort: sort
+            )
+            displayProducts = ProductMergePolicy.prependSearchLocalMatches(
+                to: displayProducts,
+                localMatches: localMatches,
+                skip: skip,
+                searchQuery: searchQuery
+            )
         }
 
-        if skip == 0 {
-            let apiIDs = Set(displayProducts.map(\.id))
-            let createdLocally = try localDataSource.allRecords()
-                .filter { $0.isLocalOnly && !$0.isCatalogHidden && $0.id < 0 && !apiIDs.contains($0.id) }
-                .map(ProductMapper.map)
-            displayProducts = createdLocally + displayProducts
-
-            if let searchQuery, !searchQuery.isEmpty {
-                let localMatches = try cachedProducts(
-                    searchQuery: searchQuery,
-                    category: category,
-                    sort: sort
-                )
-                let mergedIDs = Set(displayProducts.map(\.id))
-                let additionalMatches = localMatches.filter { !mergedIDs.contains($0.id) }
-                displayProducts = additionalMatches + displayProducts
-            }
-        }
-
-        displayProducts = deduplicated(displayProducts)
+        displayProducts = ProductMergePolicy.deduplicated(displayProducts)
         displayProducts = ProductFiltering.apply(
             to: displayProducts,
             searchQuery: searchQuery,
@@ -101,12 +101,11 @@ final class ProductRepository: ProductRepositoryProtocol {
             sortOption: sort
         )
 
-        let totalCount: Int
-        if let searchQuery, !searchQuery.isEmpty {
-            totalCount = max(response.total, displayProducts.count)
-        } else {
-            totalCount = response.total
-        }
+        let totalCount = ProductMergePolicy.totalCount(
+            apiTotal: response.total,
+            displayCount: displayProducts.count,
+            searchQuery: searchQuery
+        )
 
         return ProductPage(
             products: displayProducts,
@@ -184,14 +183,6 @@ final class ProductRepository: ProductRepositoryProtocol {
 
     func categories() throws -> [String] {
         try localDataSource.categories()
-    }
-
-    private func deduplicated(_ products: [Product]) -> [Product] {
-        var seen = Set<Int>()
-        return products.filter { product in
-            guard seen.insert(product.id).inserted else { return false }
-            return true
-        }
     }
 }
 

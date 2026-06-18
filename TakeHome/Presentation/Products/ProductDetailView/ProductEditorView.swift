@@ -43,11 +43,12 @@ struct ProductEditorView: View {
                 }
             }
         }
-        .navigationTitle(viewModel.isEditingExisting ? "Edit Product" : "Add Product")
-        .navigationBarTitleDisplayMode(.inline)
+        .localizedNavigationTitle(
+            localized(viewModel.isEditingExisting ? "Edit Product" : "Add Product")
+        )
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
+                Button(localized("Save")) {
                     HapticFeedback.play(.light)
                     Task {
                         if await viewModel.save() {
@@ -69,5 +70,9 @@ struct ProductEditorView: View {
         .task {
             await viewModel.load()
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        AppLocalization.string(key, locale: locale)
     }
 }

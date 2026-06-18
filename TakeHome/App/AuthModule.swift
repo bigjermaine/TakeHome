@@ -25,12 +25,11 @@ final class AuthModule {
         biometricAuth.canEvaluateBiometrics
     }
 
-    init(router: AppRouter) {
+    init(router: AppRouter, settingsRepository: SettingsRepositoryProtocol) {
         self.router = router
 
         let keychain = KeychainService()
         let authRepository: AuthRepositoryProtocol = AuthRepository(keychain: keychain)
-        let settingsRepository: SettingsRepositoryProtocol = SettingsRepository()
         biometricAuth = BiometricAuthenticator()
 
         loginUseCase = LoginUseCase(authRepository: authRepository)

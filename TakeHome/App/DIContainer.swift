@@ -12,7 +12,10 @@ final class DIContainer: AppRouterDependencyProviding {
     let settings: SettingsModule
 
     private(set) lazy var appRouter = AppRouter(dependencies: self)
-    private(set) lazy var auth = AuthModule(router: appRouter)
+    private(set) lazy var auth = AuthModule(
+        router: appRouter,
+        settingsRepository: settings.settingsRepository
+    )
     private(set) lazy var favorites = FavoritesModule(
         infrastructure: infrastructure,
         router: appRouter

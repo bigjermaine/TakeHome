@@ -7,12 +7,13 @@ import Foundation
 
 @MainActor
 final class SettingsModule {
+    let settingsRepository: SettingsRepositoryProtocol
     let loadSettingsUseCase: LoadSettingsUseCase
     let updateSettingsUseCase: UpdateSettingsUseCase
     let appPreferencesStore: AppPreferencesStore
 
     init() {
-        let settingsRepository: SettingsRepositoryProtocol = SettingsRepository()
+        settingsRepository = SettingsRepository()
         loadSettingsUseCase = LoadSettingsUseCase(settingsRepository: settingsRepository)
         updateSettingsUseCase = UpdateSettingsUseCase(settingsRepository: settingsRepository)
         appPreferencesStore = AppPreferencesStore(

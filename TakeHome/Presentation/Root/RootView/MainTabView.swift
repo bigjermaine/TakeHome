@@ -20,7 +20,7 @@ struct MainTabView: View {
                 viewModel: products.makeProductListViewModel()
             )
             .tabItem {
-                Label("Products", systemImage: "square.grid.2x2")
+                Label(localized("Products"), systemImage: "square.grid.2x2")
             }
             .tag(TabRoute.products)
 
@@ -29,7 +29,7 @@ struct MainTabView: View {
                 viewModel: favorites.makeFavoritesViewModel()
             )
                 .tabItem {
-                    Label("Favorites", systemImage: "heart")
+                    Label(localized("Favorites"), systemImage: "heart")
                 }
                 .tag(TabRoute.favorites)
 
