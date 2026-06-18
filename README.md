@@ -212,22 +212,20 @@ TakeHome/
 └── Resources/              # Localizable.xcstrings
 
 TakeHomeTests/
-├── Mocks/                  # One mock per file (+ InMemoryKeychain)
-├── AuthUseCaseTests.swift
-├── AuthRepositoryTests.swift
-├── KeychainStorageTests.swift
-├── LoginViewModelTests.swift
-├── FavoritesUseCaseTests.swift
-├── FavoritesViewModelTests.swift
-├── ProductRepositoryTests.swift
-├── ProductUseCaseTests.swift
-├── ProductListViewModelTests.swift
-├── AppRouterTests.swift
-├── SettingsUseCaseTests.swift
-├── ProductMapperTests.swift
-├── ProductFilteringTests.swift
-├── ProductEntityTests.swift
-└── PaginationTests.swift
+├── Mocks/                  # Test doubles + fixtures
+├── Domain/
+│   ├── Entities/           # ProductEntityTests
+│   ├── Utilities/          # ProductFilteringTests, PaginationTests
+│   └── UseCases/           # Auth, Favorites, Product, Settings use case tests
+├── Data/
+│   ├── Repositories/       # AuthRepositoryTests, ProductRepositoryTests
+│   └── Mappers/            # ProductMapperTests
+├── Platform/               # KeychainStorageTests
+└── Presentation/
+    ├── Auth/               # LoginViewModelTests
+    ├── Products/           # ProductListViewModelTests
+    ├── Favorites/          # FavoritesViewModelTests
+    └── Navigation/         # AppRouterTests
 ```
 
 ---
