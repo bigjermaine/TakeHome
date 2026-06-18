@@ -21,6 +21,7 @@ final class AppRouter: ObservableObject {
     private let dependencies: AppRouterDependencyProviding
     private var needsUnlockAfterBackground = false
     private var activeDetailPath: TabRoute?
+    private var hasBootstrapped = false
 
     init(dependencies: AppRouterDependencyProviding) {
         self.dependencies = dependencies
@@ -28,6 +29,12 @@ final class AppRouter: ObservableObject {
 
     var isBiometricAuthAvailable: Bool {
         dependencies.isBiometricAuthAvailable
+    }
+
+    func bootstrapIfNeeded() async {
+        guard !hasBootstrapped else { return }
+        hasBootstrapped = true
+        await bootstrap()
     }
 
     func bootstrap() async {

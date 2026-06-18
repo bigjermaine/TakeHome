@@ -34,8 +34,9 @@ struct MainTabView: View {
                 .tag(TabRoute.favorites)
 
             SettingsView()
+                .id(preferences.language)
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+                    Label(localized("Settings"), systemImage: "gearshape")
                 }
                 .tag(TabRoute.settings)
         }

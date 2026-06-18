@@ -30,6 +30,8 @@ private struct AppContentView: View {
     var body: some View {
         RootView(container: container)
             .environment(\.locale, preferences.locale)
-            .id(preferences.language)
+            .task {
+                await container.appRouter.bootstrapIfNeeded()
+            }
     }
 }

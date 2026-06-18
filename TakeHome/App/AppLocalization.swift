@@ -2,13 +2,13 @@
 //  AppLocalization.swift
 //  TakeHome
 //
-//  Created by jermaine daniel on 15/06/2026.
-//
 
 import Foundation
 
 enum AppLocalization {
     static func string(_ key: String, locale: Locale) -> String {
-        String(localized: String.LocalizationValue(stringLiteral: key), locale: locale)
+        var resource = LocalizedStringResource(stringLiteral: key)
+        resource.locale = locale
+        return String(localized: resource)
     }
 }

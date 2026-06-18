@@ -31,9 +31,6 @@ struct RootView: View {
             }
         }
         .preferredColorScheme(preferences.preferredColorScheme)
-        .task {
-            await router.bootstrap()
-        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background:
